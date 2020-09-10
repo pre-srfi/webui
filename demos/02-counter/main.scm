@@ -2,10 +2,9 @@
   (##inline-host-expression "g_scm2host(@1@)" obj))
 
 (define (scm2children obj)
-  (cond
-   ((string? obj) (scm2host obj))
-   ((number? obj) (scm2host obj))
-   (else obj)))
+  (if (string? obj)
+      (scm2host obj)
+      (else obj)))
 
 (define (e* name props children)
   (let ((children* (scm2children children)))
