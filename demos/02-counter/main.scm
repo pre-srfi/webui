@@ -4,13 +4,28 @@
 (define (scm2children obj)
   (if (string? obj)
       (scm2host obj)
-      (else obj)))
+      obj))
 
 (define (e* name props children)
   (let ((children* (scm2children children)))
     (##inline-host-expression
      "helpers.default.e(g_scm2host(@1@), helpers.default.makeprops(@2@), @3@)"
      name props children*)))
+
+(define (maybe-list->vector obj)
+  (if (pair? obj)
+      (list->vector obj)
+      obj))
+
+(define (webui-element name)
+  (case-lambda
+    ((children) (e* name #f (maybe-list->vector children)))
+    ((props children) (e* name props (maybe-list->vector children)))))
+
+(define div (webui-element "div"))
+(define p (webui-element "p"))
+(define button (webui-element "button"))
+
 
 (define (render! element container)
   (##inline-host-expression "helpers.default.render(@1@, @2@)"
@@ -53,8 +68,8 @@
 (define (init) 0)
 
 (define (view model mc)
-  (e* "div" #f
-      (vector (e* "p" #f (string-append "counter is " (number->string model)))
-              (e* "button" `(("onClick" . ,(mc on-click))) "increment"))))
+  (div
+      (list (p (string-append "counter is " (number->string model)))
+            (button `(("onClick" . ,(mc on-click))) "increment"))))
 
 (webui-app webui-patch! init view)
