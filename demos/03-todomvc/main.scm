@@ -1,16 +1,29 @@
+;; helpers
+
+(define (pk . args)
+  (println args)
+  (car (reverse args)))
+
+(define (ref alist key)
+  (let loop ((alist alist))
+    (if (null? alist)
+        #f
+        (if (equal? key (caar alist))
+            (cdar alist)
+            (loop (cdr alist))))))
+
+(define (filter predicate? lst)
+  (let loop ((lst lst)
+             (out '()))
+    (if (null? lst)
+        (reverse out)
+        (if (predicate? (car lst))
+            (loop (cdr lst) (cons (car lst) out))
+            (loop (cdr lst) out)))))
+
 (define (scm2host obj)
   (##inline-host-expression "g_scm2host(@1@)" obj))
 
-(define (e* name props children)
-  (if (null? children)
-      (##inline-host-expression
-       "helpers.default.e(g_scm2host(@1@), helpers.default.makeprops(@2@), null)"
-       name props)
-      (##inline-host-expression
-       "helpers.default.e(g_scm2host(@1@), helpers.default.makeprops(@2@), @3@)"
-       name props (list->vector children))))
-
-  
 (define (make-prop attr mc)
   (let ((key (symbol->string (car attr)))
         (value (cadr attr)))
@@ -26,9 +39,30 @@
 (define (make-props attrs mc)
   (map (lambda (x) (make-prop x mc)) attrs))
 
-(define (pk . args)
-  (println args)
-  (car (reverse args)))
+;; bindings
+
+(define (e* name props children)
+  (if (null? children)
+      (##inline-host-expression
+       "helpers.default.e(g_scm2host(@1@), helpers.default.makeprops(@2@), null)"
+       name props)
+      (##inline-host-expression
+       "helpers.default.e(g_scm2host(@1@), helpers.default.makeprops(@2@), @3@)"
+       name props (list->vector children))))
+
+(define (render! element container)
+  (##inline-host-expression "helpers.default.render(@1@, @2@)"
+                            element container))
+(define (document-get-element-by-id id)
+  (##inline-host-expression "document.getElementById(g_scm2host(@1@))" id))
+
+(define (webui-event-key event)
+  (##inline-host-expression "g_host2scm(@1@.key)" event))
+
+(define (webui-event-target-value event)
+  (##inline-host-expression "g_host2scm(@1@.target.value)" event))
+
+;; framework
 
 (define (sxml->vdom sxml mc)
   (if (string? sxml)
@@ -40,13 +74,6 @@
           (e* (symbol->string (car sxml))
               #f
               (map (lambda (x) (sxml->vdom x mc)) (cdr sxml))))))
-
-(define (render! element container)
-  (##inline-host-expression "helpers.default.render(@1@, @2@)"
-                            element container))
-
-(define (document-get-element-by-id id)
-  (##inline-host-expression "document.getElementById(g_scm2host(@1@))" id))
 
 (define container (document-get-element-by-id "root"))
 
@@ -73,13 +100,102 @@
       (render)))
 
   (change values)
-  
+
   change)
 
-(define (on-click model event)
-  (+ model 1))
+;; app
 
-(define (init) 0)
+(define make-uid
+  (let ((uid 0))
+    (lambda ()
+      (set! uid (+ uid 1))
+      uid)))
+
+(define (make-todo title)
+  (vector (make-uid) title #f))
+
+(define (todo-uid todo)
+  (vector-ref todo 0))
+
+(define (todo-title todo)
+  (vector-ref todo 1))
+
+(define (todo-done? todo)
+  (vector-ref todo 2))
+
+(define (todo-toggle! todo)
+  (vector-set! todo 2 (not (todo-done? todo))))
+
+(define (init)
+  (let ((learn-scheme (make-todo "Learn Scheme")))
+    (todo-toggle! learn-scheme)
+    (vector "" 'all (list learn-scheme))))
+
+(define %status->predicate
+  `((all . ,(lambda (x) #t))
+    (todo . ,(lambda (x) (not (todo-done? x))))
+    (done . ,todo-done?)))
+
+(define (on-todo-toggle todo)
+  (lambda (model event)
+    (todo-toggle! todo)
+    model))
+
+(define (on-todo-destroy todo)
+  (lambda (model event)
+    (let* ((todos (vector-ref model 2))
+           (todos (filter (lambda (x) (not (= (todo-uid x) (todo-uid todo))))
+                          todos)))
+      (vector-set! model 2 todos)
+      model)))
+
+(define (%todo-view todo)
+  `(li ,@(if (todo-done? todo) `((@ (class "completed"))) '())
+       (div (@ (class "view"))
+            (input (@ (class "toggle")
+                      (type "checkbox")
+                      (on-change ,(on-todo-toggle todo))))
+            (label ,(todo-title todo))
+            (button (@ (class "destroy")
+                       (on-click ,(on-todo-destroy todo)))))))
+
+(define (todo-view model)
+  (let* ((predicate? (ref %status->predicate (vector-ref model 1)))
+         (todos (filter predicate? (vector-ref model 2))))
+    (map %todo-view todos)))
+
+(define (on-all-selected model event)
+  (vector-set! model 1 'all)
+  model)
+
+(define (on-todo-selected model event)
+  (vector-set! model 1 'todo)
+  model)
+
+(define (on-done-selected model event)
+  (vector-set! model 1 'done)
+  model)
+
+(define (on-input model event)
+  (let* ((title (webui-event-target-value event)))
+    (vector-set! model 0 title)
+    model))
+
+(define (on-key-press model event)
+  (let* ((key (webui-event-key event)))
+    (pk key)
+    (if (and (string=? key "Enter") (not (string=? "" (vector-ref model 0))))
+        (let ((todo (make-todo (vector-ref model 0))))
+          (vector-set! model 0 "")
+          (vector-set! model 2 (cons todo (vector-ref model 2)))
+          model)
+        model)))
+
+(define (on-clear-completed model event)
+  (let* ((todos (vector-ref model 2))
+         (todos (filter (lambda (x) (not (todo-done? x))) todos)))
+    (vector-set! model 2 todos)
+    model))
 
 (define (view model)
   `(section (@ (class "todoapp"))
@@ -87,30 +203,35 @@
                     (h1 "todos")
                     (input (@ (class "new-todo")
                               (placeholder "What needs to be done?")
-                              (autofocus "t"))))
-            
+                              (autoFocus #t)
+                              (on-change ,on-input)
+                              (on-keyPress ,on-key-press)
+                              (value ,(vector-ref model 0)))))
             (section (@ (class "main"))
                      (ul (@ (class "todo-list"))
-                         (li (@ (class "completed"))
-                             (div (@ (class "view"))
-                                  (input (@ (class "toggle")
-                                             (type "checkbox")
-                                             (checked "t")))
-                                   (label "Learn Scheme")
-                                   (button (@ (class "destroy")))))))
-
+                         ,@(todo-view model)))
             (footer (@ (class "footer"))
                     (span (@ (class "todo-count"))
-                          "42 items left")
+                          ,(string-append (number->string (length (vector-ref model 2)))
+                                          " items left"))
                     (ul (@ (class "filters"))
                         (li (a (@ (href "#")
-                                  (class "selected"))
+                                  ,@(if (eq? (vector-ref model 1) 'all)
+                                        '((class "selected")) '())
+                                  (on-click ,on-all-selected))
                                "All"))
-                        (li (a (@ (href "#"))
-                               "Active"))
-                        (li (a (@ (href "#"))
-                               "Completed")))
-                    (button (@ (class "clear-completed"))
+                        (li (a (@ (href "#")
+                                  ,@(if (eq? (vector-ref model 1) 'todo)
+                                        '((class "selected")) '())
+                                  (on-click ,on-todo-selected))
+                               "Todo"))
+                        (li (a (@ (href "#")
+                                  ,@(if (eq? (vector-ref model 1) 'done)
+                                        '((class "selected")) '())
+                                  (on-click ,on-done-selected))
+                               "Done")))
+                    (button (@ (class "clear-completed")
+                               (on-click ,on-clear-completed))
                             "Clear completed"))))
 
 (webui-app webui-patch! init view)
