@@ -2,8 +2,17 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 
-let e = React.createElement
 let render = ReactDOM.render
+
+function e(name, props, children) {
+    if (children === null) {
+        return React.createElement(name, props, null);
+    }
+    
+    children.splice(0, 0, props);
+    children.splice(0, 0, name);    
+    return React.createElement.apply(React, children);
+}
 
 function makecallback (proc) {
     let procedure = function () {

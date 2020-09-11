@@ -307,10 +307,10 @@ eval("\n\nif (false) {} else {\n  module.exports = __webpack_require__(/*! ./cjs
 /*! namespace exports */
 /*! export default [provided] [maybe used in main (runtime-defined)] [usage prevents renaming] */
 /*! other exports [not provided] [maybe used in main (runtime-defined)] */
-/*! runtime requirements: __webpack_require__, __webpack_exports__, __webpack_require__.r, __webpack_require__.d, __webpack_require__.* */
+/*! runtime requirements: __webpack_require__, __webpack_require__.t, __webpack_exports__, __webpack_require__.r, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => __WEBPACK_DEFAULT_EXPORT__\n/* harmony export */ });\n/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\n/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ \"./node_modules/react-dom/index.js\");\n\n\n\n\nlet e = react__WEBPACK_IMPORTED_MODULE_0__.createElement\nlet render = react_dom__WEBPACK_IMPORTED_MODULE_1__.render\n\nfunction makecallback (proc) {\n    let procedure = function () {\n        var args = Array.prototype.slice.call(arguments);\n        return g_scm_call(proc, args) \n    };\n\n    return procedure;\n};\n\nfunction makeprops (obj) {\n    if (obj === void 0) {\n        return obj;\n    }\n    if (obj === null) {\n        return obj;\n    }\n    if (typeof obj === \"boolean\") {\n        return obj;\n    }\n    if (typeof obj === \"number\") {\n        return obj;\n    }\n    if (obj instanceof G_Flonum) {\n        return obj.val;\n    }\n    if (obj instanceof G_ScmString) {\n        return obj.toString();\n    }\n    if (obj instanceof G_Pair) {\n        var jsobj = {};\n        var i = 0;\n        while (obj instanceof G_Pair) {\n            var elem = obj.car;\n            if (elem instanceof G_Pair) {\n                jsobj[makeprops(elem.car)] = makeprops(elem.cdr);\n            } else {\n                jsobj[i] = makeprops(elem);\n            }\n            ++i;\n            obj = obj.cdr;\n        }\n        return jsobj;\n    }\n    if (obj instanceof G_Structure) {\n        throw \"scm2host error (cannot convert Structure)\";\n    }\n    if (typeof obj === \"function\") {\n        return makecallback(obj);\n    }\n    throw \"scm2host error\";\n};\n\n\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({\n    e,\n    render,\n    makeprops\n});\n\n\n//# sourceURL=webpack://helpers/./src/helpers.js?");
+eval("var react__WEBPACK_IMPORTED_MODULE_0___namespace_cache;\n__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => __WEBPACK_DEFAULT_EXPORT__\n/* harmony export */ });\n/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ \"./node_modules/react/index.js\");\n/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ \"./node_modules/react-dom/index.js\");\n\n\n\n\nlet render = react_dom__WEBPACK_IMPORTED_MODULE_1__.render\n\nfunction e(name, props, children) {\n    if (children === null) {\n        return react__WEBPACK_IMPORTED_MODULE_0__.createElement(name, props, null);\n    }\n    \n    children.splice(0, 0, props);\n    children.splice(0, 0, name);    \n    return react__WEBPACK_IMPORTED_MODULE_0__.createElement.apply(/*#__PURE__*/ (react__WEBPACK_IMPORTED_MODULE_0___namespace_cache || (react__WEBPACK_IMPORTED_MODULE_0___namespace_cache = __webpack_require__.t(react__WEBPACK_IMPORTED_MODULE_0__, 2))), children);\n}\n\nfunction makecallback (proc) {\n    let procedure = function () {\n        var args = Array.prototype.slice.call(arguments);\n        return g_scm_call(proc, args) \n    };\n\n    return procedure;\n};\n\nfunction makeprops (obj) {\n    if (obj === void 0) {\n        return obj;\n    }\n    if (obj === null) {\n        return obj;\n    }\n    if (typeof obj === \"boolean\") {\n        return obj;\n    }\n    if (typeof obj === \"number\") {\n        return obj;\n    }\n    if (obj instanceof G_Flonum) {\n        return obj.val;\n    }\n    if (obj instanceof G_ScmString) {\n        return obj.toString();\n    }\n    if (obj instanceof G_Pair) {\n        var jsobj = {};\n        var i = 0;\n        while (obj instanceof G_Pair) {\n            var elem = obj.car;\n            if (elem instanceof G_Pair) {\n                jsobj[makeprops(elem.car)] = makeprops(elem.cdr);\n            } else {\n                jsobj[i] = makeprops(elem);\n            }\n            ++i;\n            obj = obj.cdr;\n        }\n        return jsobj;\n    }\n    if (obj instanceof G_Structure) {\n        throw \"scm2host error (cannot convert Structure)\";\n    }\n    if (typeof obj === \"function\") {\n        return makecallback(obj);\n    }\n    throw \"scm2host error\";\n};\n\n\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({\n    e,\n    render,\n    makeprops\n});\n\n\n//# sourceURL=webpack://helpers/./src/helpers.js?");
 
 /***/ })
 
@@ -340,6 +340,29 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/create fake namespace object */
+/******/ 	(() => {
+/******/ 		// create a fake namespace object
+/******/ 		// mode & 1: value is a module id, require it
+/******/ 		// mode & 2: merge all properties of value into the ns
+/******/ 		// mode & 4: return value when already ns object
+/******/ 		// mode & 8|1: behave like require
+/******/ 		__webpack_require__.t = function(value, mode) {
+/******/ 			if(mode & 1) value = this(value);
+/******/ 			if(mode & 8) return value;
+/******/ 			if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 			var ns = Object.create(null);
+/******/ 			__webpack_require__.r(ns);
+/******/ 			var def = {};
+/******/ 			if(mode & 2 && typeof value == 'object' && value) {
+/******/ 				for(const key in value) def[key] = () => value[key];
+/******/ 			}
+/******/ 			def['default'] = () => value;
+/******/ 			__webpack_require__.d(ns, def);
+/******/ 			return ns;
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
