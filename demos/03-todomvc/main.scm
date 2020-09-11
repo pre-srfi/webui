@@ -212,7 +212,7 @@
                          ,@(todo-view model)))
             (footer (@ (class "footer"))
                     (span (@ (class "todo-count"))
-                          ,(string-append (number->string (length (vector-ref model 2)))
+                          ,(string-append (number->string (length (filter (lambda (x) (not (todo-done? x))) (vector-ref model 2))))
                                           " items left"))
                     (ul (@ (class "filters"))
                         (li (a (@ (href "#")
