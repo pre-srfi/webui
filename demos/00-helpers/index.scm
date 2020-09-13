@@ -1,0 +1,1 @@
+(apropos "" (current-output-port))
