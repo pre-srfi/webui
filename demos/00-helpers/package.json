@@ -4,6 +4,10 @@
   "description": "",
   "main": "helpers.js",
   "dependencies": {
+    "assert": "^2.0.0",
+    "events": "^3.2.0",
+    "fdb-tuple": "^1.0.0",
+    "functional-red-black-tree": "^1.0.1",
     "lodash": "^4.17.20",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

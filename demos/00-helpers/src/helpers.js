@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import createTree from "functional-red-black-tree";
 
 
 let render = ReactDOM.render
@@ -66,10 +67,26 @@ function makeprops (obj) {
     throw "scm2host error";
 };
 
+function compare(o1, o2) {
+    o1 = g_scm2host(o1);
+    o2 = g_scm2host(o2);
+    
+    if (o1 === o2) {
+        return g_host2scm(0);
+    } else {
+        if (o1 < o2) {
+            return g_host2scm(-1);
+        } else {
+            return g_host2scm(1);
+        }
+    }
+}
 
 
 export default {
     e,
     render,
-    makeprops
+    makeprops,
+    createTree,
+    compare
 }
