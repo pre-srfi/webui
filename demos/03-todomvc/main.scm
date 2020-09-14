@@ -183,7 +183,6 @@
 
 (define (on-key-press model event)
   (let* ((key (webui-event-key event)))
-    (pk key)
     (if (and (string=? key "Enter") (not (string=? "" (vector-ref model 0))))
         (let ((todo (make-todo (vector-ref model 0))))
           (vector-set! model 0 "")
