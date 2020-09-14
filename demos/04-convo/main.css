@@ -55,3 +55,7 @@ input {
     border: 0px;
     width: 100%;
 }
+
+.message {
+    cursor: pointer;
+}
