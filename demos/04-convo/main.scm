@@ -594,15 +594,44 @@
   (define parent (vector-ref model 0))
   (define message (vector-ref model 1))
   (define uid (make-uid))
-
   (set! db (nstore-add db space (vector uid "parent" parent)))
-  (set! db (nstore-add db space (vector uid "message" message))))
+  (set! db (nstore-add db space (vector uid "message" message)))
+  uid)
+
+(define (new-reply! parent text)
+  (define uid (make-uid))
+  (set! db (nstore-add db space (vector uid "parent" parent)))
+  (set! db (nstore-add db space (vector uid "message" text))))
 
 (define (on-key-press model event)
   (let* ((key (webui-event-key event)))
     (if (and (string=? key "Enter") (not (string=? "" (vector-ref model 1))))
-        (begin (new-message! model) (vector-set! model 1 "") model)
-        model)))
+      (let ((msg-uid (new-message! model)))
+        (begin
+          (vector-set! model 1 "")
+          (schedule-a-mock-reply msg-uid)
+        )
+      )
+    )
+  )
+  model
+)
+
+(define (schedule-a-mock-reply msg-uid)
+  (define text (db-query-message msg-uid))
+  (##inline-host-expression "helpers.default.schedule_a_mock_reply(@1@, @2@)"
+    text
+    (lambda (reply-text)
+      (begin
+        (log reply-text)
+        (new-reply! msg-uid reply-text)
+      )
+    )
+  )
+)
+
+(define (log obj)
+  (##inline-host-expression "console.log(@1@)" obj))
 
 (define (init) (vector #f ""))
 

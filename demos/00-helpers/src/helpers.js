@@ -1,3 +1,26 @@
+import { setCORS } from "google-translate-api-browser";
+const translate = setCORS("http://cors-anywhere.herokuapp.com/");
+
+function schedule_a_mock_reply(message_text, callback)
+{
+	message_text = g_scm2host(message_text);
+	console.log("translating " + message_text.toString() + "...");
+	translate(message_text, { to: "en" })
+		.then(res => {
+			console.log('ok, translation is:' + res.text);
+			g_scm_call(callback,[g_host2scm(res.text)]);
+		})
+		.catch(err => {
+			console.log('translate err');
+			console.error(err);
+			g_scm_call(callback,err.toString())
+		});
+};
+
+// -------------
+
+
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import createTree from "functional-red-black-tree";
@@ -88,5 +111,6 @@ export default {
     render,
     makeprops,
     createTree,
-    compare
+    compare,
+    schedule_a_mock_reply
 }
