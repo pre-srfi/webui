@@ -1,0 +1,47 @@
+body {
+    background: url('bg.png');
+    margin: 0px;
+    padding: 0px;
+}
+
+* {
+    font-family: mono;
+    color: #FEFEFE;
+    line-height: 1.1em;
+    box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    text-shadow: 2px 2px 0px black;
+}
+
+p {
+    margin: 0px;
+    padding: 0px;
+}
+
+a:link,
+a:visited,
+a:active {
+    color: white;
+    text-decoration: none;
+}
+
+.box {
+    background: linear-gradient(0deg, hsla(0, 0%, 0%, 0.1) 5px, hsla(0, 0%, 100%, 0.1));
+    border: 1px solid hsla(0, 0%, 100%, 0.3);
+    border-bottom: 1px solid hsla(0, 0%, 0%, 1);
+    border-radius: 5px;
+    border-right: 1px solid hsla(0, 0%, 0%, 1);
+    box-shadow: -1px -1px 1px hsla(0, 0%, 100%, 0.1), 1px 1px 1px black;
+    display: block;
+    margin: auto;
+    margin-bottom: 15px;
+    padding: 15px;
+}
+
+input[type="submit"].box:hover {
+    background: hsla(0, 0%, 0%, 0.4);
+    cursor: pointer;
+    border: 0px;
+}
